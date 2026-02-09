@@ -1,0 +1,25 @@
+span,
+p {
+  font-size: 12px;
+  font-family: "Univers Condensed";
+}
+
+.cal h2 {
+  font-size: 36px;
+  font-family: "Univers Condensed";
+  font-weight: bold;
+}
+
+.cal > h2 {
+  color: var(--primary-color);
+}
+
+.cal-months {
+  display: flex;
+}
+
+.days {
+  display: grid;
+  grid-column-gap: 5px;
+  grid-template-columns: repeat(30, 1fr);
+}

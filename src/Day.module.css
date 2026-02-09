@@ -1,0 +1,19 @@
+.day {
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+}
+
+.day-lower {
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+  width: 100%;
+}
+
+.moon {
+  width: 100%;
+  border: 1px solid black;
+  border-radius: 100%;
+  aspect-ratio: 1 / 1;
+}

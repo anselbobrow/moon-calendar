@@ -21,7 +21,7 @@ interface CalendarProps {
 const Calendar: Component<CalendarProps> = (props) => {
   const [{ instant, locale }, _] = splitProps(props, ["instant", "locale"]);
   const fetcher = new PhaseData().getData;
-  const [moonData] = createResource(instant(), fetcher);
+  const [moonData] = createResource(instant, fetcher);
   const date = createMemo(() => instant().toZonedDateTimeISO("UTC"));
   const year = createMemo(() =>
     date().toLocaleString(locale(), {
@@ -44,9 +44,9 @@ const Calendar: Component<CalendarProps> = (props) => {
       case 1:
         return "WAXING GIBBOUS";
       case 2:
-        return "WANING CRESCENT";
-      case 3:
         return "WANING GIBBOUS";
+      case 3:
+        return "WANING CRESCENT";
       default:
         return "";
     }

@@ -21,7 +21,7 @@
   display: flex;
   color: #888;
   flex-direction: column;
-  place-items: center;
+  align-items: center;
   width: 100%;
 
   > :first-child {

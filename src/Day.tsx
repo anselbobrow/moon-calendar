@@ -53,7 +53,7 @@ const Day: Component<
             [styles.isHalf]: isHalf,
           }}
         >
-          {isQuarter ? quarterName(phase) : Math.round(percentFullness)}
+          {isQuarter ? quarterName(phase) : `${Math.round(percentFullness)}%`}
         </span>
       </div>
     </div>

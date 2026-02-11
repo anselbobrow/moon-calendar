@@ -5,6 +5,7 @@ import {
   createResource,
   Index,
   Match,
+  Setter,
   Show,
   splitProps,
   Switch,
@@ -17,10 +18,17 @@ import PhaseData from "./data/phaseDataDao";
 interface CalendarProps {
   instant: Accessor<Temporal.Instant>;
   locale: Accessor<string>;
+  setMonth: Setter<number>;
+  setYear: Setter<number>;
 }
 
 const Calendar: Component<CalendarProps> = (props) => {
-  const [{ instant, locale }, _] = splitProps(props, ["instant", "locale"]);
+  const [{ instant, locale, setMonth, setYear }, _] = splitProps(props, [
+    "instant",
+    "locale",
+    "setMonth",
+    "setYear",
+  ]);
   const fetcher = new PhaseData().getData;
   const [moonData] = createResource(instant, fetcher);
   const date = createMemo(() => instant().toZonedDateTimeISO("UTC"));
@@ -54,8 +62,32 @@ const Calendar: Component<CalendarProps> = (props) => {
   };
   return (
     <div class={styles.cal}>
-      <h2>{year()}</h2>
-      <div>
+      <div class={styles["year-header"]}>
+        <input
+          type="number"
+          value={date().year}
+          min={1900}
+          max={2100}
+          required
+          onInput={(e) =>
+            e.currentTarget.checkValidity() &&
+            setYear(e.currentTarget.valueAsNumber)
+          }
+        />
+        <h2>{year()}</h2>
+      </div>
+      <div class={styles["month-header"]}>
+        <input
+          type="number"
+          value={date().month}
+          min={1}
+          max={12}
+          required
+          onInput={(e) =>
+            e.currentTarget.checkValidity() &&
+            setMonth(e.currentTarget.valueAsNumber)
+          }
+        />
         <h2>{month()}</h2>
       </div>
       <div class={styles.month}>

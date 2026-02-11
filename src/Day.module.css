@@ -5,6 +5,9 @@
   text-align: center;
   min-width: 40px;
 
+  .weekend {
+    border: 1px solid #000;
+  }
   > :first-child {
     padding: 5px 0;
     height: 18px;

@@ -1,4 +1,4 @@
-import { splitProps, type Component } from "solid-js";
+import { createMemo, splitProps, type Component } from "solid-js";
 
 import styles from "./Day.module.css";
 import { DayProps, Phase } from "./data/phaseDataDao";
@@ -38,10 +38,11 @@ const Day: Component<DayProps & { phase: Phase }> = (props) => {
         return "";
     }
   };
+  const weekend = createMemo(() => weekDay === "S");
   return (
     <div class={styles.day}>
-      <span>{weekDay !== "S" && weekDay}</span>
-      <span>{dayOfMonth}</span>
+      <span>{!weekend() && weekDay}</span>
+      <span classList={{ [styles.weekend]: weekend() }}>{dayOfMonth}</span>
       <div class={styles["day-lower"]}>
         <span>{dayOfCycle}</span>
         <div class={styles.moon} />

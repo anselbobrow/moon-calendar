@@ -1,25 +1,39 @@
 span,
 p {
-  font-size: 12px;
+  font-size: 12pt;
   font-family: "Univers Condensed";
 }
 
 .cal h2 {
-  font-size: 36px;
+  font-size: 24pt;
   font-family: "Univers Condensed";
   font-weight: bold;
+  padding-left: 10px;
 }
 
 .cal > h2 {
   color: var(--primary-color);
+  padding-top: 10px;
 }
 
-.cal-months {
+.month {
   display: flex;
+  padding: 0px 10px;
 }
 
-.days {
-  display: grid;
-  grid-column-gap: 5px;
-  grid-template-columns: repeat(30, 1fr);
+.phase {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+
+  > div {
+    display: grid;
+    flex-grow: 1;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+  }
+  > span {
+    color: var(--primary-color);
+    align-self: center;
+  }
 }

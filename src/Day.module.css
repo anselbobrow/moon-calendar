@@ -2,18 +2,47 @@
   display: flex;
   flex-direction: column;
   place-items: center;
+  text-align: center;
+  min-width: 40px;
+
+  > :first-child {
+    padding: 5px 0;
+    height: 18px;
+  }
+  > :nth-child(2) {
+    border-top: 1px solid #000;
+    border-bottom: 1px solid #000;
+    padding: 3px 0;
+    width: 100%;
+  }
 }
 
 .day-lower {
   display: flex;
+  color: #888;
   flex-direction: column;
   place-items: center;
   width: 100%;
+
+  > :first-child {
+    font-weight: bold;
+    padding: 5px 0;
+  }
+  > :last-child {
+    padding-top: 20px;
+    padding-bottom: 5px;
+  }
+  .isQuarter {
+    color: #000;
+  }
+  .isHalf {
+    font-weight: bold;
+  }
 }
 
 .moon {
-  width: 100%;
-  border: 1px solid black;
+  width: 90%;
+  border: 2px solid #000;
   border-radius: 100%;
   aspect-ratio: 1 / 1;
 }

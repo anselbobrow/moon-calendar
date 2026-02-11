@@ -1,17 +1,60 @@
-import { Accessor, splitProps, type Component } from "solid-js";
+import { splitProps, type Component } from "solid-js";
 
 import styles from "./Day.module.css";
+import { DayProps, Phase } from "./data/phaseDataDao";
 
-const Day: Component<{ phase: Accessor<number>; day: number }> = (props) => {
-  const [{ phase, day }, _] = splitProps(props, ["phase", "day"]);
+const Day: Component<
+  DayProps & { isQuarter: boolean; isHalf: boolean; phase: Phase }
+> = (props) => {
+  const [
+    {
+      weekDay,
+      dayOfMonth,
+      dayOfCycle,
+      percentFullness,
+      phase,
+      isQuarter,
+      isHalf,
+    },
+    _,
+  ] = splitProps(props, [
+    "weekDay",
+    "phase",
+    "percentFullness",
+    "dayOfCycle",
+    "dayOfMonth",
+    "isQuarter",
+    "isHalf",
+  ]);
+  const quarterName = (phase: Phase): string => {
+    switch (phase) {
+      case 0:
+        return "NEW MOON";
+      case 1:
+        return "FIRST QUARTER";
+      case 2:
+        return "FULL MOON";
+      case 3:
+        return "LAST QUARTER";
+      default:
+        return "";
+    }
+  };
   return (
     <div class={styles.day}>
-      <span>M</span>
-      <span>{day}</span>
+      <span>{weekDay !== "S" && weekDay}</span>
+      <span>{dayOfMonth}</span>
       <div class={styles["day-lower"]}>
-        <span>0</span>
+        <span>{dayOfCycle}</span>
         <div class={styles.moon} />
-        <span class={styles.percent}>{phase()}%</span>
+        <span
+          classList={{
+            [styles.isQuarter]: isQuarter,
+            [styles.isHalf]: isHalf,
+          }}
+        >
+          {isQuarter ? quarterName(phase) : Math.round(percentFullness)}
+        </span>
       </div>
     </div>
   );

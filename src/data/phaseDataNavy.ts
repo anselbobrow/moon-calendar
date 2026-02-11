@@ -1,19 +1,5 @@
 import { Temporal } from "@js-temporal/polyfill";
-
-enum Phase {
-  WaxingCrescent,
-  WaxingGibbous,
-  WaningGibbous,
-  WaningCrescent,
-}
-
-interface DayProps {
-  weekDay: string;
-  dayOfMonth: number;
-  dayOfCycle: number;
-  percentFullness: number;
-  phase: Phase;
-}
+import { CalProps, DayProps, Phase, PhaseDataDao } from "./phaseDataDao";
 
 interface PhaseData {
   day: number;
@@ -32,11 +18,22 @@ interface Data {
   year: number;
 }
 
+/** PhaseData implementation based on interpolation from the Navy API
+ * linked below. This implementation is inaccurate as you cannot reasonably
+ * interpolate between quarters to get accurate daily percentages, and
+ * so I have abandoned this approach in favor of the astronomy-engine
+ * package on NPM, see PhaseDataAstroEngine.ts for more info. */
+export default class PhaseDataNavy implements PhaseDataDao {
+  async getData(instant: Temporal.Instant): Promise<CalProps> {
+    return getData({ instant });
+  }
+}
+
 const getData = async ({
   instant,
 }: {
   instant: Temporal.Instant;
-}): Promise<number[]> => {
+}): Promise<CalProps> => {
   const params = new URLSearchParams();
   params.append("date", apiRequestStartDate(instant));
   // a month can contain up to 5 phases, we add
@@ -51,23 +48,67 @@ const getData = async ({
       throw new Error(response.statusText);
     }
     const data = await response.json();
-    return transformData(data, instant);
+    return {
+      phases: [
+        { phase: Phase.WaxingCrescent, days: transformData(data, instant) },
+      ],
+    };
   } catch (e) {
     console.log((e as Error).message);
     throw e;
   }
 };
 
-const transformData = (data: Data, instant: Temporal.Instant): number[] => {
+const transformData = (data: Data, instant: Temporal.Instant): DayProps[] => {
   // how many days to truncate from the result,
   // as they are in the previous month
-  const offset = getOffset(data, instant);
-  const percentageFullnessByDay = getPercentageFullnessByDay(data);
-  const daysInMonth = instant.toZonedDateTimeISO("UTC").daysInMonth;
-  return percentageFullnessByDay.slice(offset, offset + daysInMonth);
+  const offset: number = getOffset(data, instant);
+  const daysInMonth: number = instant.toZonedDateTimeISO("UTC").daysInMonth;
+  const percentageCycleByDay: number[] = getPercentageCycleByDay(data);
+  const percentageCycleInMonth: number[] = percentageCycleByDay.slice(
+    offset,
+    offset + daysInMonth,
+  );
+  const monthOfDayProps: DayProps[] = mapPercentageCycleToDayProps(
+    percentageCycleInMonth,
+    instant,
+  );
+  return monthOfDayProps;
 };
 
-const getPercentageFullnessByDay = (data: Data): number[] => {
+const mapPercentageCycleToDayProps = (
+  input: number[],
+  instant: Temporal.Instant,
+): DayProps[] => {
+  const plainDate = instant.toZonedDateTimeISO("UTC").toPlainDate();
+  return input.map((percentCycle, idx) => {
+    const percentFullness = Math.round(
+      percentCycle < 50 ? percentCycle * 2 : percentCycle * -2 + 200,
+    );
+    let phase: Phase;
+    if (percentCycle < 25) {
+      phase = Phase.WaxingCrescent;
+    } else if (percentCycle < 50) {
+      phase = Phase.WaxingGibbous;
+    } else if (percentCycle < 75) {
+      phase = Phase.WaningGibbous;
+    } else {
+      phase = Phase.WaningCrescent;
+    }
+    return {
+      percentFullness,
+      weekDay: plainDate
+        .with({ day: idx + 1 })
+        .toLocaleString("en-US", { weekday: "narrow" }),
+      dayOfMonth: idx + 1,
+      // TODO
+      dayOfCycle: 0,
+      eclipticLongitude: phase,
+    };
+  });
+};
+
+const getPercentageCycleByDay = (data: Data): number[] => {
   // create input from data
   const firstPhase = data.phasedata[0];
   const firstPhasePlainDate = Temporal.PlainDate.from({
@@ -100,7 +141,7 @@ const getPercentageFullnessByDay = (data: Data): number[] => {
     const dt = d2 - d1;
     const dp = p2 - p1;
     for (let n = 0; n < dt; n++) {
-      arr[d1 + n] = Math.round((p1 + n * (dp / dt)) * 100);
+      arr[d1 + n] = (p1 + n * (dp / dt)) * 100;
     }
   }
   return arr;
@@ -148,5 +189,3 @@ const phaseFromString = (input: string): number | undefined => {
       throw new Error("Invalid phase.");
   }
 };
-
-export { getData, type DayProps, Phase };

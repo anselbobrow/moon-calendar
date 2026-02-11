@@ -3,9 +3,7 @@ import { splitProps, type Component } from "solid-js";
 import styles from "./Day.module.css";
 import { DayProps, Phase } from "./data/phaseDataDao";
 
-const Day: Component<
-  DayProps & { isQuarter: boolean; isHalf: boolean; phase: Phase }
-> = (props) => {
+const Day: Component<DayProps & { phase: Phase }> = (props) => {
   const [
     {
       weekDay,

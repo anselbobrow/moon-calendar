@@ -5,6 +5,7 @@ import {
   createResource,
   Index,
   Match,
+  Show,
   splitProps,
   Switch,
 } from "solid-js";
@@ -71,17 +72,12 @@ const Calendar: Component<CalendarProps> = (props) => {
                 <div class={styles.phase}>
                   <div>
                     <Index each={phase().days}>
-                      {(props, idx) => (
-                        <Day
-                          {...props()}
-                          isQuarter={idx === 0}
-                          isHalf={idx === 0 && phase().phase % 2 === 0}
-                          phase={phase().phase}
-                        />
-                      )}
+                      {(props) => <Day {...props()} phase={phase().phase} />}
                     </Index>
                   </div>
-                  <span>{phaseName(phase().phase)}</span>
+                  <Show when={phase().days.length > 2}>
+                    <span>{phaseName(phase().phase)}</span>
+                  </Show>
                 </div>
               )}
             </Index>

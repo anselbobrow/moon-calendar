@@ -43,6 +43,8 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
     });
   };
 
+  /** Given a moon quarter, fill up an array of DayProps objs
+   * for all days within both the phase and the month of interest */
   private phasePropsFromMoonQuarter = (
     mq: Astronomy.MoonQuarter,
     month: number,
@@ -59,9 +61,11 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
     );
     let day = this.getTemporalStartOfDay(mq.time);
     while (Temporal.ZonedDateTime.compare(day, nextQuarterStart) === -1) {
+      // only push days that are within the month we're interested in
       // Date.getUTCMonth is 0-indexed, while ZonedDateTime.month is 1-indexed
       if (day.month === month + 1) {
         const date = new Date(day.epochMilliseconds);
+        const isQuarter = mq.time.date.getUTCDate() === day.day;
         days.push({
           weekDay: day.toLocaleString("en-US", { weekday: "narrow" }),
           dayOfMonth: day.day,
@@ -70,6 +74,8 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
             Astronomy.Illumination(Astronomy.Body.Moon, date).phase_fraction *
             100,
           eclipticLongitude: Astronomy.MoonPhase(date),
+          isQuarter,
+          isHalf: isQuarter && mq.quarter % 2 === 0,
         });
       }
       day = day.add({ days: 1 });
@@ -77,6 +83,7 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
     return { phase: mq.quarter as Phase, days };
   };
 
+  /** Converts an AstroDate to the start of day as a Temporal.Instant */
   private getTemporalStartOfDay = (
     time: Astronomy.AstroTime,
   ): Temporal.ZonedDateTime => {
@@ -85,8 +92,8 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
       .withPlainTime();
   };
 
-  // based on implementation of NextMoonQuarter:
-  // https://github.com/cosinekitty/astronomy/blob/865d3da7d8112bbc7911238052c6af4aaf877181/demo/nodejs/astronomy.js#L4823
+  /** Based on implementation of NextMoonQuarter:
+   * https://github.com/cosinekitty/astronomy/blob/865d3da7d8112bbc7911238052c6af4aaf877181/demo/nodejs/astronomy.js#L4823 */
   private prevMoonQuarter = (
     mq: Astronomy.MoonQuarter,
   ): Astronomy.MoonQuarter => {
@@ -98,34 +105,5 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
       throw "Couldn't find previous moon quarter";
     }
     return new Astronomy.MoonQuarter(quarter, time);
-  };
-
-  getRoughData = async (instant: Temporal.Instant): Promise<CalProps> => {
-    return new Promise((res, rej) => {
-      try {
-        let day = instant.toZonedDateTimeISO("UTC");
-        const dayProps: DayProps[] = Array.from(
-          { length: day.daysInMonth },
-          (_, i) => {
-            day = day.with({ day: i + 1 });
-            const date = new Date(day.epochMilliseconds);
-            const phase = Astronomy.MoonPhase(date);
-            return {
-              weekDay: day.toLocaleString("en-US", { weekday: "narrow" }),
-              dayOfMonth: i + 1,
-              // TODO this is a rough estimate
-              dayOfCycle: Math.round(phase / 12.2),
-              percentFullness:
-                Astronomy.Illumination(Astronomy.Body.Moon, date)
-                  .phase_fraction * 100,
-              eclipticLongitude: phase,
-            };
-          },
-        );
-        res({ phases: [{ phase: Phase.WaxingCrescent, days: dayProps }] });
-      } catch (e) {
-        rej((e as Error).message);
-      }
-    });
   };
 }

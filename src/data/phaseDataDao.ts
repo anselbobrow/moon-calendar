@@ -14,6 +14,8 @@ interface DayProps {
   dayOfCycle: number;
   percentFullness: number;
   eclipticLongitude: number;
+  isQuarter: boolean;
+  isHalf: boolean;
 }
 
 interface PhaseProps {

@@ -21,6 +21,7 @@ p {
 .phase {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 
   > div {
     display: grid;

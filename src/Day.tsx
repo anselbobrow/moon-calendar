@@ -2,6 +2,7 @@ import { createMemo, splitProps, type Component } from "solid-js";
 
 import styles from "./Day.module.css";
 import { DayProps, Phase } from "./data/phaseDataDao";
+import Moon from "./Moon";
 
 const Day: Component<DayProps & { phase: Phase }> = (props) => {
   const [
@@ -10,19 +11,23 @@ const Day: Component<DayProps & { phase: Phase }> = (props) => {
       dayOfMonth,
       dayOfCycle,
       percentFullness,
+      eclipticLongitude,
       phase,
       isQuarter,
       isHalf,
+      tilt,
     },
     _,
   ] = splitProps(props, [
     "weekDay",
     "phase",
     "percentFullness",
+    "eclipticLongitude",
     "dayOfCycle",
     "dayOfMonth",
     "isQuarter",
     "isHalf",
+    "tilt",
   ]);
   const quarterName = (phase: Phase): string => {
     switch (phase) {
@@ -45,7 +50,9 @@ const Day: Component<DayProps & { phase: Phase }> = (props) => {
       <span classList={{ [styles.weekend]: weekend() }}>{dayOfMonth}</span>
       <div class={styles["day-lower"]}>
         <span>{dayOfCycle}</span>
-        <div class={styles.moon} />
+        <div class={styles.moon}>
+          <Moon eclipticLongitude={eclipticLongitude} tilt={tilt} />
+        </div>
         <span
           classList={{
             [styles.isQuarter]: isQuarter,

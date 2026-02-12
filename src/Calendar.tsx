@@ -93,7 +93,7 @@ const Calendar: Component<CalendarProps> = (props) => {
       <div class={styles.month}>
         <Switch>
           <Match when={moonData.state === "errored"}>
-            <p>{JSON.stringify(moonData.error)}</p>
+            <p>{moonData.error.message}</p>
           </Match>
           <Match when={moonData.state === "pending"}>
             <p>Loading...</p>

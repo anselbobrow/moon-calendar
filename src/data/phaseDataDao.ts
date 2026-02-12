@@ -16,6 +16,7 @@ interface DayProps {
   eclipticLongitude: number;
   isQuarter: boolean;
   isHalf: boolean;
+  tilt: number;
 }
 
 interface PhaseProps {

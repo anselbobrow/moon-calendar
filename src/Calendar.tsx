@@ -104,11 +104,24 @@ const Calendar: Component<CalendarProps> = (props) => {
                 <div class={styles.phase}>
                   <div>
                     <Index each={phase().days}>
-                      {(props) => <Day {...props()} phase={phase().phase} />}
+                      {(props) => (
+                        <Day
+                          {...props()}
+                          phase={phase().phase}
+                          afterFirstNewOfMonth={phase().afterFirstNewOfMonth}
+                        />
+                      )}
                     </Index>
                   </div>
                   <Show when={phase().days.length > 2}>
-                    <span>{phaseName(phase().phase)}</span>
+                    <span
+                      classList={{
+                        [styles["after-first-new"]]:
+                          phase().afterFirstNewOfMonth,
+                      }}
+                    >
+                      {phaseName(phase().phase)}
+                    </span>
                   </Show>
                 </div>
               )}

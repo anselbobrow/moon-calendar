@@ -35,11 +35,14 @@
     padding-top: 20px;
     padding-bottom: 5px;
   }
-  .isQuarter {
+  .is-quarter {
     color: #000;
   }
-  .isHalf {
+  .is-half {
     font-weight: bold;
+  }
+  .after-first-new & {
+    color: var(--primary-color);
   }
 }
 

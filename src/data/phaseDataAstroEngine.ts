@@ -41,9 +41,20 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
           allQuarters.push(quarter);
           quarter = Astronomy.NextMoonQuarter(quarter);
         }
-        const phases = allQuarters.map((q) =>
-          this.phasePropsFromMoonQuarter(q, startOfMonth.getUTCMonth()),
-        );
+        const phases: PhaseProps[] = [];
+        let afterFirstNewOfMonth = false;
+        for (const q of allQuarters) {
+          if (
+            q.time.date.getUTCMonth() === startOfMonth.getUTCMonth() &&
+            q.quarter === 0
+          )
+            afterFirstNewOfMonth = true;
+          const phaseProps = this.phasePropsFromMoonQuarter(
+            q,
+            startOfMonth.getUTCMonth(),
+          );
+          phases.push({ ...phaseProps, afterFirstNewOfMonth });
+        }
         res({ phases });
       } catch (e) {
         rej(e);
@@ -56,7 +67,7 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
   private phasePropsFromMoonQuarter = (
     mq: Astronomy.MoonQuarter,
     month: number,
-  ): PhaseProps => {
+  ): Omit<PhaseProps, "afterFirstNewOfMonth"> => {
     let lastNewMoonQuarter = mq;
     while (lastNewMoonQuarter.quarter !== 0) {
       lastNewMoonQuarter = this.prevMoonQuarter(lastNewMoonQuarter);
@@ -74,6 +85,12 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
       if (day.month === month + 1) {
         const date = new Date(day.epochMilliseconds);
         const isQuarter = mq.time.date.getUTCDate() === day.day;
+        const culmination = Astronomy.SearchHourAngle(
+          Astronomy.Body.Moon,
+          this.observer,
+          0,
+          new Date(day.startOfDay().epochMilliseconds),
+        );
         days.push({
           weekDay: day.toLocaleString("en-US", { weekday: "narrow" }),
           dayOfMonth: day.day,
@@ -87,15 +104,7 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
           eclipticLongitude: Astronomy.MoonPhase(date),
           isQuarter,
           isHalf: isQuarter && mq.quarter % 2 === 0,
-          tilt: this.getMoonTiltDegrees(
-            this.observer,
-            Astronomy.SearchHourAngle(
-              Astronomy.Body.Moon,
-              this.observer,
-              0,
-              date,
-            ).time,
-          ),
+          tilt: this.getMoonTiltDegrees(this.observer, culmination.time),
         });
       }
       day = day.add({ days: 1 });

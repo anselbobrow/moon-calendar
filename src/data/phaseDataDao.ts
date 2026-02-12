@@ -21,6 +21,7 @@ interface DayProps {
 
 interface PhaseProps {
   phase: Phase;
+  afterFirstNewOfMonth: boolean;
   days: DayProps[];
 }
 

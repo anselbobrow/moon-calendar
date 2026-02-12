@@ -4,7 +4,9 @@ import styles from "./Day.module.css";
 import { DayProps, Phase } from "./data/phaseDataDao";
 import Moon from "./Moon";
 
-const Day: Component<DayProps & { phase: Phase }> = (props) => {
+const Day: Component<
+  DayProps & { phase: Phase; afterFirstNewOfMonth: boolean }
+> = (props) => {
   const [
     {
       weekDay,
@@ -16,6 +18,7 @@ const Day: Component<DayProps & { phase: Phase }> = (props) => {
       isQuarter,
       isHalf,
       tilt,
+      afterFirstNewOfMonth,
     },
     _,
   ] = splitProps(props, [
@@ -28,6 +31,7 @@ const Day: Component<DayProps & { phase: Phase }> = (props) => {
     "isQuarter",
     "isHalf",
     "tilt",
+    "afterFirstNewOfMonth",
   ]);
   const quarterName = (phase: Phase): string => {
     switch (phase) {
@@ -45,18 +49,27 @@ const Day: Component<DayProps & { phase: Phase }> = (props) => {
   };
   const weekend = createMemo(() => weekDay === "S");
   return (
-    <div class={styles.day}>
+    <div
+      classList={{
+        [styles.day]: true,
+        [styles["after-first-new"]]: afterFirstNewOfMonth,
+      }}
+    >
       <span>{!weekend() && weekDay}</span>
       <span classList={{ [styles.weekend]: weekend() }}>{dayOfMonth}</span>
       <div class={styles["day-lower"]}>
         <span>{dayOfCycle}</span>
         <div class={styles.moon}>
-          <Moon eclipticLongitude={eclipticLongitude} tilt={tilt} />
+          <Moon
+            eclipticLongitude={eclipticLongitude}
+            tilt={tilt}
+            isQuarter={isQuarter}
+          />
         </div>
         <span
           classList={{
-            [styles.isQuarter]: isQuarter,
-            [styles.isHalf]: isHalf,
+            [styles["is-quarter"]]: isQuarter,
+            [styles["is-half"]]: isHalf,
           }}
         >
           {isQuarter ? quarterName(phase) : `${Math.round(percentFullness)}%`}

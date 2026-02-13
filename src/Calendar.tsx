@@ -11,7 +11,7 @@ import styles from "./Calendar.module.css";
 import { Temporal } from "@js-temporal/polyfill";
 import Day from "./Day";
 import PhaseData from "./data/phaseDataDao";
-import { Position } from "./types/common";
+import { PHASE_NAMES, Position } from "./types/common";
 
 interface CalendarProps {
   state: {
@@ -25,10 +25,10 @@ interface CalendarProps {
 
 const Calendar: Component<CalendarProps> = (props) => {
   const fetcher = new PhaseData().getData;
-  const resourceProps = () => ({
+  const resourceProps = createMemo(() => ({
     zdt: props.state.zdt,
     position: props.state.position,
-  });
+  }));
   const [moonData] = createResource(resourceProps, fetcher);
 
   const year = createMemo(() =>
@@ -45,21 +45,6 @@ const Calendar: Component<CalendarProps> = (props) => {
       })
       .toUpperCase(),
   );
-
-  const phaseName = (phase: number): string => {
-    switch (phase) {
-      case 0:
-        return "WAXING CRESCENT";
-      case 1:
-        return "WAXING GIBBOUS";
-      case 2:
-        return "WANING GIBBOUS";
-      case 3:
-        return "WANING CRESCENT";
-      default:
-        return "";
-    }
-  };
 
   return (
     <div class={styles.cal}>
@@ -105,9 +90,9 @@ const Calendar: Component<CalendarProps> = (props) => {
                 <div class={styles.phase}>
                   <div>
                     <Index each={phase().days}>
-                      {(props) => (
+                      {(dayProps) => (
                         <Day
-                          {...props()}
+                          {...dayProps()}
                           phase={phase().phase}
                           afterFirstNewOfMonth={phase().afterFirstNewOfMonth}
                         />
@@ -121,7 +106,7 @@ const Calendar: Component<CalendarProps> = (props) => {
                           phase().afterFirstNewOfMonth,
                       }}
                     >
-                      {phaseName(phase().phase)}
+                      {PHASE_NAMES[phase().phase]}
                     </span>
                   </Show>
                 </div>

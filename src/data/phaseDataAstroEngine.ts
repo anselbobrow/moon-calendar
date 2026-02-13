@@ -105,7 +105,9 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
         days.push({
           weekDay: day.toLocaleString("en-US", { weekday: "narrow" }),
           dayOfMonth: day.day,
-          dayOfCycle: day.since(lastNewMoonDay).total({ unit: "day" }),
+          dayOfCycle: Math.round(
+            day.since(lastNewMoonDay).total({ unit: "day" }),
+          ),
           percentFullness:
             Astronomy.Illumination(Astronomy.Body.Moon, date).phase_fraction *
             100,

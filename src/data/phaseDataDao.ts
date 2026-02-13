@@ -31,12 +31,13 @@ interface PhaseDataDao {
 }
 
 /** Wrapper class for easy switching out of the backend */
-export default class PhaseData implements PhaseDataDao {
+class PhaseData implements PhaseDataDao {
   getData(args: PhaseDataProps): Promise<MoonData> {
     return new PhaseDataAstroEngine().getData(args);
   }
 }
 
+export default PhaseData;
 export {
   Phase,
   type PhaseDataDao,

@@ -3,12 +3,11 @@ import { onMount, type Component } from "solid-js";
 import Calendar, { CalendarProps } from "./Calendar";
 import { Temporal } from "@js-temporal/polyfill";
 import { createStore } from "solid-js/store";
-import { UTC } from "./types/common";
 
 const App: Component = () => {
   const [state, setState] = createStore<CalendarProps["state"]>({
     locale: "en-US",
-    zdt: Temporal.Now.instant().toZonedDateTimeISO(UTC),
+    zdt: Temporal.Now.zonedDateTimeISO(),
     position: [0, 0, 0],
   });
 

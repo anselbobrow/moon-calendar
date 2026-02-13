@@ -8,7 +8,6 @@ import {
   MoonDataPhase,
 } from "./phaseDataDao";
 import * as Astronomy from "astronomy-engine";
-import { UTC } from "../types/common";
 
 export default class PhaseDataAstroEngine implements PhaseDataDao {
   observer!: Astronomy.Observer;
@@ -19,39 +18,18 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
   };
 
   private getDataByPhase = async (
-    instant: Temporal.ZonedDateTime,
+    zdt: Temporal.ZonedDateTime,
   ): Promise<MoonData> => {
     return new Promise((res, rej) => {
       try {
         const startOfMonth = new Date(
-          instant.with({ day: 1 }).startOfDay().epochMilliseconds,
+          zdt.with({ day: 1 }).startOfDay().epochMilliseconds,
         );
-        const firstQuarterOfMonth = Astronomy.SearchMoonQuarter(startOfMonth);
-        const allQuarters: Astronomy.MoonQuarter[] = [];
-        if (firstQuarterOfMonth.time.date.getUTCDate() !== 1) {
-          const lastQuarterOfPreviousMonth =
-            this.prevMoonQuarter(firstQuarterOfMonth);
-          allQuarters.push(lastQuarterOfPreviousMonth);
-        }
-        let quarter = firstQuarterOfMonth;
-        while (quarter.time.date.getUTCMonth() === startOfMonth.getUTCMonth()) {
-          allQuarters.push(quarter);
-          quarter = Astronomy.NextMoonQuarter(quarter);
-        }
-        const phases: MoonDataPhase[] = [];
-        let afterFirstNewOfMonth = false;
-        for (const q of allQuarters) {
-          if (
-            q.time.date.getUTCMonth() === startOfMonth.getUTCMonth() &&
-            q.quarter === 0
-          )
-            afterFirstNewOfMonth = true;
-          const phaseProps = this.phasePropsFromMoonQuarter(
-            q,
-            startOfMonth.getUTCMonth(),
-          );
-          phases.push({ ...phaseProps, afterFirstNewOfMonth });
-        }
+        const allQuarters = this.getAllQuartersForMonth(startOfMonth);
+        const phases = this.quartersToMoonDataPhases(
+          allQuarters,
+          startOfMonth.getMonth(),
+        );
         res({ phases });
       } catch (e) {
         rej(e);
@@ -59,8 +37,45 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
     });
   };
 
-  /** Given a moon quarter, fill up an array of DayProps objs
-   * for all days within both the phase and the month of interest */
+  /** Fills in the MoonDataPhase object for the corresponding phases to all
+   * quarters in the input list */
+  private quartersToMoonDataPhases = (
+    quarters: Astronomy.MoonQuarter[],
+    month: number,
+  ): MoonDataPhase[] => {
+    const phases: MoonDataPhase[] = [];
+    let afterFirstNewOfMonth = false;
+    for (const q of quarters) {
+      if (q.time.date.getMonth() === month && q.quarter === 0)
+        afterFirstNewOfMonth = true;
+      const partialMoonDataPhase = this.phasePropsFromMoonQuarter(q, month);
+      phases.push({ ...partialMoonDataPhase, afterFirstNewOfMonth });
+    }
+    return phases;
+  };
+
+  /** Returns a list of all moon quarters whose following phases contain days
+   * in the month specified by startOfMonth */
+  private getAllQuartersForMonth = (
+    startOfMonth: Date,
+  ): Astronomy.MoonQuarter[] => {
+    const allQuarters: Astronomy.MoonQuarter[] = [];
+    const firstQuarterOfMonth = Astronomy.SearchMoonQuarter(startOfMonth);
+    if (firstQuarterOfMonth.time.date.getDate() !== 1) {
+      const lastQuarterOfPreviousMonth =
+        this.prevMoonQuarter(firstQuarterOfMonth);
+      allQuarters.push(lastQuarterOfPreviousMonth);
+    }
+    let quarter = firstQuarterOfMonth;
+    while (quarter.time.date.getMonth() === startOfMonth.getMonth()) {
+      allQuarters.push(quarter);
+      quarter = Astronomy.NextMoonQuarter(quarter);
+    }
+    return allQuarters;
+  };
+
+  /** Given a moon quarter, fill up an array of DayProps objs for all days
+   * within both the phase and the month of interest. */
   private phasePropsFromMoonQuarter = (
     mq: Astronomy.MoonQuarter,
     month: number,
@@ -70,18 +85,17 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
       lastNewMoonQuarter = this.prevMoonQuarter(lastNewMoonQuarter);
     }
     const lastNewMoonDay = this.getTemporalNoon(lastNewMoonQuarter.time);
-
     const days: DayProps[] = [];
-    const nextQuarterStart = this.getTemporalNoon(
-      Astronomy.NextMoonQuarter(mq).time,
-    );
+    const thisQuarterStartDay = mq.time.date.getDate();
+    const nextQuarterStartDay =
+      Astronomy.NextMoonQuarter(mq).time.date.getDate();
     let day = this.getTemporalNoon(mq.time);
-    while (day.day !== nextQuarterStart.day) {
-      // only push days that are within the month we're interested in
-      // Date.getUTCMonth is 0-indexed, while ZonedDateTime.month is 1-indexed
-      if (day.month === month + 1) {
+    while (day.day !== nextQuarterStartDay) {
+      // Only push days that are within the month we're interested in
+      // Date.getMonth is 0-indexed, while ZonedDateTime.month is 1-indexed
+      if (day.month - 1 === month) {
         const date = new Date(day.epochMilliseconds);
-        const isQuarter = mq.time.date.getUTCDate() === day.day;
+        const isQuarter = thisQuarterStartDay === day.day;
         const culmination = Astronomy.SearchHourAngle(
           Astronomy.Body.Moon,
           this.observer,
@@ -91,10 +105,7 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
         days.push({
           weekDay: day.toLocaleString("en-US", { weekday: "narrow" }),
           dayOfMonth: day.day,
-          dayOfCycle: day
-            .startOfDay()
-            .since(lastNewMoonDay.startOfDay())
-            .total({ unit: "day" }),
+          dayOfCycle: day.since(lastNewMoonDay).total({ unit: "day" }),
           percentFullness:
             Astronomy.Illumination(Astronomy.Body.Moon, date).phase_fraction *
             100,
@@ -113,7 +124,7 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
     time: Astronomy.AstroTime,
   ): Temporal.ZonedDateTime => {
     return Temporal.Instant.fromEpochMilliseconds(time.date.getTime())
-      .toZonedDateTimeISO(UTC) // TODO should be local time to calculate based off noon local
+      .toZonedDateTimeISO(Temporal.Now.timeZoneId())
       .withPlainTime({ hour: 12 });
   };
 

@@ -9,7 +9,7 @@ import {
 } from "./phaseDataDao";
 import * as Astronomy from "astronomy-engine";
 
-export default class PhaseDataAstroEngine implements PhaseDataDao {
+class PhaseDataAstroEngine implements PhaseDataDao {
   observer!: Astronomy.Observer;
 
   getData = async (args: PhaseDataProps): Promise<MoonData> => {
@@ -203,3 +203,4 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
     return tilt;
   };
 }
+export default PhaseDataAstroEngine;

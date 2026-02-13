@@ -29,7 +29,7 @@ interface Data {
  * interpolate between quarters to get accurate daily percentages, and
  * so I have abandoned this approach in favor of the astronomy-engine
  * package on NPM, see PhaseDataAstroEngine.ts for more info. */
-export default class PhaseDataNavy implements PhaseDataDao {
+class PhaseDataNavy implements PhaseDataDao {
   async getData(args: PhaseDataProps): Promise<MoonData> {
     return this.getDataWithNavyApi({ zdt: args.zdt });
   }
@@ -204,3 +204,5 @@ export default class PhaseDataNavy implements PhaseDataDao {
     }
   };
 }
+
+export default PhaseDataNavy;

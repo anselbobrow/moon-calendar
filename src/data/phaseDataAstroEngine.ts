@@ -4,6 +4,7 @@ import {
   DayProps,
   Phase,
   PhaseDataDao,
+  PhaseDataProps,
   PhaseProps,
 } from "./phaseDataDao";
 import * as Astronomy from "astronomy-engine";
@@ -11,23 +12,18 @@ import * as Astronomy from "astronomy-engine";
 export default class PhaseDataAstroEngine implements PhaseDataDao {
   observer!: Astronomy.Observer;
 
-  getData = async (instant: Temporal.Instant): Promise<CalProps> => {
-    this.observer = new Astronomy.Observer(
-      51.4933946385166,
-      0.009813322455776815,
-      0,
-    );
-    return this.getDataByPhase(instant);
+  getData = async (args: PhaseDataProps): Promise<CalProps> => {
+    this.observer = new Astronomy.Observer(...args.position);
+    return this.getDataByPhase(args.zdt);
   };
 
   private getDataByPhase = async (
-    instant: Temporal.Instant,
+    instant: Temporal.ZonedDateTime,
   ): Promise<CalProps> => {
     return new Promise((res, rej) => {
       try {
         const startOfMonth = new Date(
-          instant.toZonedDateTimeISO("UTC").with({ day: 1 }).startOfDay()
-            .epochMilliseconds,
+          instant.with({ day: 1 }).startOfDay().epochMilliseconds,
         );
         const firstQuarterOfMonth = Astronomy.SearchMoonQuarter(startOfMonth);
         const allQuarters: Astronomy.MoonQuarter[] = [];

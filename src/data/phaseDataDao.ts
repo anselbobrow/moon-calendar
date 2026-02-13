@@ -1,5 +1,6 @@
 import { Temporal } from "@js-temporal/polyfill";
 import PhaseDataAstroEngine from "./phaseDataAstroEngine";
+import { Position } from "../App";
 
 enum Phase {
   WaxingCrescent,
@@ -29,13 +30,18 @@ interface CalProps {
   phases: PhaseProps[];
 }
 
+interface PhaseDataProps {
+  zdt: Temporal.ZonedDateTime;
+  position: Position;
+}
+
 interface PhaseDataDao {
-  getData(instant: Temporal.Instant): Promise<CalProps>;
+  getData(args: PhaseDataProps): Promise<CalProps>;
 }
 
 export default class PhaseData implements PhaseDataDao {
-  getData(instant: Temporal.Instant): Promise<CalProps> {
-    return new PhaseDataAstroEngine().getData(instant);
+  getData(args: PhaseDataProps): Promise<CalProps> {
+    return new PhaseDataAstroEngine().getData(args);
   }
 }
 
@@ -45,4 +51,5 @@ export {
   type DayProps,
   type PhaseProps,
   type CalProps,
+  type PhaseDataProps,
 };

@@ -1,51 +1,51 @@
 import {
-  Accessor,
   Component,
   createMemo,
   createResource,
   Index,
   Match,
-  Setter,
   Show,
-  splitProps,
   Switch,
 } from "solid-js";
 import styles from "./Calendar.module.css";
 import { Temporal } from "@js-temporal/polyfill";
 import Day from "./Day";
 import PhaseData from "./data/phaseDataDao";
+import { Position } from "./App";
 
-interface CalendarProps {
-  instant: Accessor<Temporal.Instant>;
-  locale: Accessor<string>;
-  setMonth: Setter<number>;
-  setYear: Setter<number>;
+export interface CalendarProps {
+  state: {
+    zdt: Temporal.ZonedDateTime;
+    position: Position;
+    locale: string;
+  };
+  setYear: (n: number) => void;
+  setMonth: (n: number) => void;
 }
 
 const Calendar: Component<CalendarProps> = (props) => {
-  const [{ instant, locale, setMonth, setYear }, _] = splitProps(props, [
-    "instant",
-    "locale",
-    "setMonth",
-    "setYear",
-  ]);
   const fetcher = new PhaseData().getData;
-  const [moonData] = createResource(instant, fetcher);
-  const date = createMemo(() => instant().toZonedDateTimeISO("UTC"));
+  const resourceProps = () => ({
+    zdt: props.state.zdt,
+    position: props.state.position,
+  });
+  const [moonData] = createResource(resourceProps, fetcher);
+
   const year = createMemo(() =>
-    date().toLocaleString(locale(), {
-      calendar: date().calendarId,
+    props.state.zdt.toLocaleString(props.state.locale, {
+      calendar: props.state.zdt.calendarId,
       year: "numeric",
     }),
   );
   const month = createMemo(() =>
-    date()
-      .toLocaleString(locale(), {
-        calendar: date().calendarId,
+    props.state.zdt
+      .toLocaleString(props.state.locale, {
+        calendar: props.state.zdt.calendarId,
         month: "long",
       })
       .toUpperCase(),
   );
+
   const phaseName = (phase: number): string => {
     switch (phase) {
       case 0:
@@ -60,18 +60,19 @@ const Calendar: Component<CalendarProps> = (props) => {
         return "";
     }
   };
+
   return (
     <div class={styles.cal}>
       <div class={styles["year-header"]}>
         <input
           type="number"
-          value={date().year}
+          value={props.state.zdt.year}
           min={1900}
           max={2100}
           required
           onInput={(e) =>
             e.currentTarget.checkValidity() &&
-            setYear(e.currentTarget.valueAsNumber)
+            props.setYear(e.currentTarget.valueAsNumber)
           }
         />
         <h2>{year()}</h2>
@@ -79,13 +80,13 @@ const Calendar: Component<CalendarProps> = (props) => {
       <div class={styles["month-header"]}>
         <input
           type="number"
-          value={date().month}
+          value={props.state.zdt.month}
           min={1}
           max={12}
           required
           onInput={(e) =>
             e.currentTarget.checkValidity() &&
-            setMonth(e.currentTarget.valueAsNumber)
+            props.setMonth(e.currentTarget.valueAsNumber)
           }
         />
         <h2>{month()}</h2>

@@ -1,6 +1,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import PhaseDataAstroEngine from "./phaseDataAstroEngine";
-import { Position } from "../App";
+import { DayProps } from "../Day";
+import { Position } from "../types/common";
 
 enum Phase {
   WaxingCrescent,
@@ -9,25 +10,14 @@ enum Phase {
   WaningCrescent,
 }
 
-interface DayProps {
-  weekDay: string;
-  dayOfMonth: number;
-  dayOfCycle: number;
-  percentFullness: number;
-  eclipticLongitude: number;
-  isQuarter: boolean;
-  isHalf: boolean;
-  tilt: number;
-}
-
-interface PhaseProps {
+interface MoonDataPhase {
   phase: Phase;
   afterFirstNewOfMonth: boolean;
   days: DayProps[];
 }
 
-interface CalProps {
-  phases: PhaseProps[];
+interface MoonData {
+  phases: MoonDataPhase[];
 }
 
 interface PhaseDataProps {
@@ -35,12 +25,14 @@ interface PhaseDataProps {
   position: Position;
 }
 
+/** Interface for all PhaseData providers, including the wrapper class below */
 interface PhaseDataDao {
-  getData(args: PhaseDataProps): Promise<CalProps>;
+  getData(args: PhaseDataProps): Promise<MoonData>;
 }
 
+/** Wrapper class for easy switching out of the backend */
 export default class PhaseData implements PhaseDataDao {
-  getData(args: PhaseDataProps): Promise<CalProps> {
+  getData(args: PhaseDataProps): Promise<MoonData> {
     return new PhaseDataAstroEngine().getData(args);
   }
 }
@@ -49,7 +41,7 @@ export {
   Phase,
   type PhaseDataDao,
   type DayProps,
-  type PhaseProps,
-  type CalProps,
+  type MoonDataPhase,
+  type MoonData,
   type PhaseDataProps,
 };

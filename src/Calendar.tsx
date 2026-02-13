@@ -11,9 +11,9 @@ import styles from "./Calendar.module.css";
 import { Temporal } from "@js-temporal/polyfill";
 import Day from "./Day";
 import PhaseData from "./data/phaseDataDao";
-import { Position } from "./App";
+import { Position } from "./types/common";
 
-export interface CalendarProps {
+interface CalendarProps {
   state: {
     zdt: Temporal.ZonedDateTime;
     position: Position;
@@ -135,3 +135,4 @@ const Calendar: Component<CalendarProps> = (props) => {
 };
 
 export default Calendar;
+export { type CalendarProps };

@@ -3,9 +3,7 @@ import { onMount, type Component } from "solid-js";
 import Calendar, { CalendarProps } from "./Calendar";
 import { Temporal } from "@js-temporal/polyfill";
 import { createStore } from "solid-js/store";
-
-export type Position = [latitude: number, longitude: number, altitude: number];
-export const UTC = "UTC";
+import { UTC } from "./types/common";
 
 const App: Component = () => {
   const [state, setState] = createStore<CalendarProps["state"]>({

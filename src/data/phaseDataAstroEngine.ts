@@ -1,25 +1,26 @@
 import { Temporal } from "@js-temporal/polyfill";
 import {
-  CalProps,
+  MoonData,
   DayProps,
   Phase,
   PhaseDataDao,
   PhaseDataProps,
-  PhaseProps,
+  MoonDataPhase,
 } from "./phaseDataDao";
 import * as Astronomy from "astronomy-engine";
+import { UTC } from "../types/common";
 
 export default class PhaseDataAstroEngine implements PhaseDataDao {
   observer!: Astronomy.Observer;
 
-  getData = async (args: PhaseDataProps): Promise<CalProps> => {
+  getData = async (args: PhaseDataProps): Promise<MoonData> => {
     this.observer = new Astronomy.Observer(...args.position);
     return this.getDataByPhase(args.zdt);
   };
 
   private getDataByPhase = async (
     instant: Temporal.ZonedDateTime,
-  ): Promise<CalProps> => {
+  ): Promise<MoonData> => {
     return new Promise((res, rej) => {
       try {
         const startOfMonth = new Date(
@@ -37,7 +38,7 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
           allQuarters.push(quarter);
           quarter = Astronomy.NextMoonQuarter(quarter);
         }
-        const phases: PhaseProps[] = [];
+        const phases: MoonDataPhase[] = [];
         let afterFirstNewOfMonth = false;
         for (const q of allQuarters) {
           if (
@@ -63,7 +64,7 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
   private phasePropsFromMoonQuarter = (
     mq: Astronomy.MoonQuarter,
     month: number,
-  ): Omit<PhaseProps, "afterFirstNewOfMonth"> => {
+  ): Omit<MoonDataPhase, "afterFirstNewOfMonth"> => {
     let lastNewMoonQuarter = mq;
     while (lastNewMoonQuarter.quarter !== 0) {
       lastNewMoonQuarter = this.prevMoonQuarter(lastNewMoonQuarter);
@@ -112,7 +113,7 @@ export default class PhaseDataAstroEngine implements PhaseDataDao {
     time: Astronomy.AstroTime,
   ): Temporal.ZonedDateTime => {
     return Temporal.Instant.fromEpochMilliseconds(time.date.getTime())
-      .toZonedDateTimeISO("UTC") // TODO should be local time to calculate based off noon local
+      .toZonedDateTimeISO(UTC) // TODO should be local time to calculate based off noon local
       .withPlainTime({ hour: 12 });
   };
 

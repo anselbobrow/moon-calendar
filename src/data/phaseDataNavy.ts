@@ -63,7 +63,7 @@ const transformData = (data: Data, instant: Temporal.Instant): DayProps[] => {
   // how many days to truncate from the result,
   // as they are in the previous month
   const offset: number = getOffset(data, instant);
-  const daysInMonth: number = instant.toZonedDateTimeISO("UTC").daysInMonth;
+  const daysInMonth: number = instant.toZonedDateTimeISO(UTC).daysInMonth;
   const percentageCycleByDay: number[] = getPercentageCycleByDay(data);
   const percentageCycleInMonth: number[] = percentageCycleByDay.slice(
     offset,

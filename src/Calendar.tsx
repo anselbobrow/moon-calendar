@@ -19,8 +19,6 @@ interface CalendarProps {
     position: Position;
     locale: string;
   };
-  setYear: (n: number) => void;
-  setMonth: (n: number) => void;
 }
 
 const Calendar: Component<CalendarProps> = (props) => {
@@ -31,12 +29,6 @@ const Calendar: Component<CalendarProps> = (props) => {
   }));
   const [moonData] = createResource(resourceProps, fetcher);
 
-  const year = createMemo(() =>
-    props.state.zdt.toLocaleString(props.state.locale, {
-      calendar: props.state.zdt.calendarId,
-      year: "numeric",
-    }),
-  );
   const month = createMemo(() =>
     props.state.zdt
       .toLocaleString(props.state.locale, {
@@ -48,35 +40,8 @@ const Calendar: Component<CalendarProps> = (props) => {
 
   return (
     <div class={styles.cal}>
-      <div class={styles["year-header"]}>
-        <input
-          type="number"
-          value={props.state.zdt.year}
-          min={1900}
-          max={2100}
-          required
-          onInput={(e) =>
-            e.currentTarget.checkValidity() &&
-            props.setYear(e.currentTarget.valueAsNumber)
-          }
-        />
-        <h2>{year()}</h2>
-      </div>
-      <div class={styles["month-header"]}>
-        <input
-          type="number"
-          value={props.state.zdt.month}
-          min={1}
-          max={12}
-          required
-          onInput={(e) =>
-            e.currentTarget.checkValidity() &&
-            props.setMonth(e.currentTarget.valueAsNumber)
-          }
-        />
-        <h2>{month()}</h2>
-      </div>
-      <div class={styles.month}>
+      <h2>{month()}</h2>
+      <div>
         <Switch>
           <Match when={moonData.state === "errored"}>
             <p>{moonData.error.message}</p>

@@ -1,30 +1,5 @@
-span,
-p {
-  font-size: 12pt;
-  font-family: "Univers Condensed";
-}
-
 .cal > div {
   display: flex;
-}
-
-.cal h2 {
-  font-size: 24pt;
-  font-family: "Univers Condensed";
-  font-weight: bold;
-}
-
-.year-header {
-  color: var(--primary-color);
-  > :first-child {
-    margin-right: 10px;
-  }
-}
-
-.month-header {
-  > :first-child {
-    margin-right: 10px;
-  }
 }
 
 input[type="number"] {
@@ -39,7 +14,7 @@ input[type="number"] {
   > div {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: 3.33vw;
+    grid-auto-columns: calc(100vw / 31);
   }
   > span {
     align-self: center;

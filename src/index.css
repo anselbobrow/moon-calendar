@@ -125,7 +125,6 @@ table {
 }
 
 /* import fonts */
-
 @font-face {
   font-family: "Univers Condensed";
   src:
@@ -149,4 +148,16 @@ table {
 /* define variables */
 :root {
   --primary-color: hsl(208.76, 53.78%, 55.88%);
+}
+
+/* some global styles */
+body {
+  font-size: 12pt;
+  font-family: "Univers Condensed";
+}
+
+h2 {
+  font-size: 24pt;
+  font-family: "Univers Condensed";
+  font-weight: bold;
 }

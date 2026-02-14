@@ -103,7 +103,7 @@ class PhaseDataAstroEngine implements PhaseDataDao {
           new Date(day.startOfDay().epochMilliseconds),
         );
         days.push({
-          weekDay: day.toLocaleString("en-US", { weekday: "narrow" }),
+          dayOfWeek: day.dayOfWeek,
           dayOfMonth: day.day,
           dayOfCycle: Math.round(
             day.since(lastNewMoonDay).total({ unit: "day" }),

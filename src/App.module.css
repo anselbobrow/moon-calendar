@@ -1,0 +1,16 @@
+.inputs {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+
+  div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  margin-bottom: 10px;
+}
+
+.year-header {
+  color: var(--primary-color);
+}

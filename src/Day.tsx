@@ -1,12 +1,12 @@
-import { createMemo, splitProps, type Component } from "solid-js";
+import { splitProps, type Component } from "solid-js";
 
 import styles from "./Day.module.css";
 import { Phase } from "./data/phaseDataDao";
 import Moon from "./Moon";
-import { QUARTER_NAMES } from "./types/common";
+import { QUARTER_NAMES, WEEKDAYS } from "./types/common";
 
 interface DayProps {
-  weekDay: string;
+  dayOfWeek: number;
   dayOfMonth: number;
   dayOfCycle: number;
   percentFullness: number;
@@ -19,7 +19,6 @@ interface DayProps {
 const Day: Component<
   DayProps & { phase: Phase; afterFirstNewOfMonth: boolean }
 > = (props) => {
-  const weekend = createMemo(() => props.weekDay === "S");
   const [moonProps] = splitProps(props, [
     "eclipticLongitude",
     "tilt",
@@ -32,8 +31,15 @@ const Day: Component<
         [styles["after-first-new"]]: props.afterFirstNewOfMonth,
       }}
     >
-      <span>{!weekend() && props.weekDay}</span>
-      <span classList={{ [styles.weekend]: weekend() }}>
+      <span classList={{ [styles.saturday]: props.dayOfWeek === 6 }}>
+        {props.dayOfWeek < 6 && WEEKDAYS[props.dayOfWeek - 1]}
+      </span>
+      <span
+        classList={{
+          [styles.saturday]: props.dayOfWeek === 6,
+          [styles.sunday]: props.dayOfWeek === 7,
+        }}
+      >
         {props.dayOfMonth}
       </span>
       <div class={styles["day-lower"]}>

@@ -84,16 +84,11 @@ class PhaseDataNavy implements PhaseDataDao {
     );
     const monthOfDayProps: DayProps[] = this.mapPercentageCycleToDayProps(
       percentageCycleInMonth,
-      zdt,
     );
     return monthOfDayProps;
   };
 
-  private mapPercentageCycleToDayProps = (
-    input: number[],
-    zdt: Temporal.ZonedDateTime,
-  ): DayProps[] => {
-    const plainDate = zdt.toPlainDate();
+  private mapPercentageCycleToDayProps = (input: number[]): DayProps[] => {
     return input.map((percentCycle, idx) => {
       const percentFullness = Math.round(
         percentCycle < 50 ? percentCycle * 2 : percentCycle * -2 + 200,
@@ -110,9 +105,7 @@ class PhaseDataNavy implements PhaseDataDao {
       }
       return {
         percentFullness,
-        weekDay: plainDate
-          .with({ day: idx + 1 })
-          .toLocaleString("en-US", { weekday: "narrow" }),
+        dayOfWeek: 0, // FIXME unimplemented
         dayOfMonth: idx + 1,
         eclipticLongitude: 0, // FIXME unimplemented
         dayOfCycle: 0, // FIXME unimplemented

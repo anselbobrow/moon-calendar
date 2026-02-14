@@ -11,3 +11,4 @@ export const QUARTER_NAMES = [
   "FULL MOON",
   "LAST QUARTER",
 ];
+export const WEEKDAYS = ["M", "T", "W", "Th", "F", "S", "Su"];

@@ -148,6 +148,7 @@ table {
 /* define variables */
 :root {
   --primary-color: hsl(208.76, 53.78%, 55.88%);
+  --margin-sides: 20px;
 }
 
 /* some global styles */

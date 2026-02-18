@@ -2,15 +2,22 @@
   display: flex;
   gap: 10px;
   font-size: 12px;
+  margin: var(--margin-sides);
 
   div {
     display: flex;
     flex-direction: column;
   }
+}
 
-  margin-bottom: 10px;
+hr {
+  border: 0.5px dashed black;
+  margin: 0;
 }
 
 .year-header {
+  display: flex;
+  justify-content: center;
   color: var(--primary-color);
+  margin-top: var(--margin-sides);
 }

@@ -1,5 +1,11 @@
 .cal > div {
   display: flex;
+  margin: 0 var(--margin-sides);
+  margin-bottom: 20px;
+}
+
+.cal > h2 {
+  margin-left: var(--margin-sides);
 }
 
 input[type="number"] {
@@ -14,7 +20,7 @@ input[type="number"] {
   > div {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: calc(100vw / 31);
+    grid-auto-columns: calc((100vw - 2 * var(--margin-sides)) / 31);
   }
   > span {
     align-self: center;

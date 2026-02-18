@@ -14,9 +14,27 @@ const App: Component = () => {
 
   const [numMonths, setNumMonths] = createSignal(1);
   const months = createMemo(() =>
-    Array.from({ length: numMonths() }, (_, idx) => (
-      <Calendar state={{ ...state, zdt: state.zdt.add({ months: idx }) }} />
-    )),
+    Array.from({ length: numMonths() }, (_, idx) => {
+      const newZdt = state.zdt.add({ months: idx });
+      const cal = <Calendar state={{ ...state, zdt: newZdt }} />;
+      if (newZdt.month === 1 || idx === 0) {
+        return (
+          <>
+            <div class={styles["year-header"]}>
+              <h2>
+                {newZdt.toLocaleString(state.locale, {
+                  calendar: newZdt.calendarId,
+                  year: "numeric",
+                })}
+              </h2>
+            </div>
+            {cal}
+          </>
+        );
+      } else {
+        return cal;
+      }
+    }),
   );
 
   const setMonth = (month: number) => setState("zdt", (i) => i.with({ month }));
@@ -46,13 +64,6 @@ const App: Component = () => {
       },
     );
   });
-
-  const year = createMemo(() =>
-    state.zdt.toLocaleString(state.locale, {
-      calendar: state.zdt.calendarId,
-      year: "numeric",
-    }),
-  );
 
   return (
     <main>
@@ -103,9 +114,7 @@ const App: Component = () => {
           />
         </div>
       </div>
-      <div class={styles["year-header"]}>
-        <h2>{year()}</h2>
-      </div>
+      <hr />
       {months()}
     </main>
   );

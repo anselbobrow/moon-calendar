@@ -5,11 +5,11 @@
   text-align: center;
 
   .saturday {
-    border-left: 1px solid #000;
+    border-left: 1px solid var(--border-color);
     border-right: 1px solid var(--primary-color);
   }
   .sunday {
-    border-right: 1px solid #000;
+    border-right: 1px solid var(--border-color);
   }
   > :first-child {
     padding: 5px 0;
@@ -17,15 +17,15 @@
     border-left: none;
   }
   > :nth-child(2) {
-    border-top: 1px solid #000;
-    border-bottom: 1px solid #000;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
     padding: 3px 0;
   }
 }
 
 .day-lower {
   display: flex;
-  color: #888;
+  color: var(--secondary-text-color);
   flex-direction: column;
   align-items: center;
 
@@ -38,7 +38,7 @@
     padding-bottom: 5px;
   }
   .is-quarter {
-    color: #000;
+    color: var(--text-color);
   }
   .is-half {
     font-weight: bold;

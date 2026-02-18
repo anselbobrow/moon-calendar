@@ -1,4 +1,13 @@
 .moon {
   width: 100%;
   height: 100%;
+  circle {
+    fill: var(--moon-shadow-color);
+    &.is-quarter {
+      fill: var(--primary-color);
+    }
+  }
+  path {
+    fill: var(--moon-illuminated-color);
+  }
 }

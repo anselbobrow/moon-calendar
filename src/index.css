@@ -149,16 +149,33 @@ table {
 :root {
   --primary-color: hsl(208.76, 53.78%, 55.88%);
   --margin-sides: 20px;
+  --background-color: "#fff";
+  --text-color: #000;
+  --secondary-text-color: #888;
+  --border-color: #000;
+  --moon-shadow-color: #000;
+  --moon-illuminated-color: #fff;
+  @media (prefers-color-scheme: dark) {
+    --primary-color: hsl(208.76, 75%, 65%);
+    --background-color: #0a0a0a;
+    --text-color: #fff;
+    --secondary-text-color: #777;
+    --border-color: #ddd;
+    --moon-shadow-color: #222;
+    --moon-illuminated-color: #fff;
+  }
 }
 
 /* some global styles */
 body {
-  font-size: 12pt;
+  font-size: 1rem;
   font-family: "Univers Condensed";
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 h2 {
-  font-size: 24pt;
+  font-size: 2rem;
   font-family: "Univers Condensed";
   font-weight: bold;
 }

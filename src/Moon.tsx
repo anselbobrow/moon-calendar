@@ -21,9 +21,9 @@ const Moon: Component<{
         cx={21}
         cy={21}
         r={20}
-        fill={props.isQuarter ? "#5291cb" : "#000"}
+        classList={{ [styles["is-quarter"]]: props.isQuarter }}
       />
-      <path fill="#fff" d={path()(hemisphere)!} />
+      <path d={path()(hemisphere)!} />
     </svg>
   );
 };

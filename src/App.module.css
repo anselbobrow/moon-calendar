@@ -11,7 +11,7 @@
 }
 
 hr {
-  border: 0.5px dashed black;
+  border: 0.5px dashed var(--border-color);
   margin: 0;
 }
 

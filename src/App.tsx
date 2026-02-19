@@ -1,4 +1,13 @@
-import { createMemo, createSignal, onMount, type Component } from "solid-js";
+import {
+  batch,
+  createEffect,
+  createSignal,
+  For,
+  on,
+  onMount,
+  Show,
+  type Component,
+} from "solid-js";
 
 import Calendar, { CalendarProps } from "./Calendar";
 import { Temporal } from "@js-temporal/polyfill";
@@ -6,44 +15,50 @@ import { createStore } from "solid-js/store";
 import styles from "./App.module.css";
 
 const App: Component = () => {
-  const [state, setState] = createStore<CalendarProps["state"]>({
+  const [state, setState] = createStore<CalendarProps>({
     locale: "en-US",
     zdt: Temporal.Now.zonedDateTimeISO(),
     position: [0, 0, 0],
   });
 
-  const [numMonths, setNumMonths] = createSignal(1);
-  const months = createMemo(() =>
-    Array.from({ length: numMonths() }, (_, idx) => {
-      const newZdt = state.zdt.add({ months: idx });
-      const cal = <Calendar state={{ ...state, zdt: newZdt }} />;
-      if (newZdt.month === 1 || idx === 0) {
-        return (
-          <>
-            <div class={styles["year-header"]}>
-              <h2>
-                {newZdt.toLocaleString(state.locale, {
-                  calendar: newZdt.calendarId,
-                  year: "numeric",
-                })}
-              </h2>
-            </div>
-            {cal}
-          </>
-        );
-      } else {
-        return cal;
-      }
-    }),
-  );
-
   const setMonth = (month: number) => setState("zdt", (i) => i.with({ month }));
   const setYear = (year: number) => setState("zdt", (i) => i.with({ year }));
 
+  // logic to track state for displayed calendar months
+  const [numMonths, setNumMonths] = createSignal(1);
+  const [monthStates, setMonthStates] = createSignal([{ ...state }]);
+  const handleNumMonths = (n: number) => {
+    if (n < monthStates().length) {
+      setMonthStates((prev) => prev.slice(0, n));
+    }
+    fillMonths(n);
+    setNumMonths(n);
+  };
+  const fillMonths = (n: number) => {
+    batch(() => {
+      while (n > monthStates().length) {
+        setMonthStates((prev) => [
+          ...prev,
+          {
+            ...prev[prev.length - 1],
+            zdt: prev[prev.length - 1].zdt.add({ months: 1 }),
+          },
+        ]);
+      }
+    });
+  };
+  createEffect(
+    on([() => state.zdt, () => state.position], () => {
+      setMonthStates([{ ...state }]);
+      fillMonths(numMonths());
+    }),
+  );
+
+  // location getting logic
   const getPositionFromIP = () => {
+    console.error("getPositionFromIP not implemented");
     setState("position", (p) => p);
   };
-
   onMount(() => {
     if (!("geolocation" in navigator)) {
       getPositionFromIP();
@@ -57,7 +72,7 @@ const App: Component = () => {
         ]);
       },
       (e: GeolocationPositionError) => {
-        console.error(
+        console.log(
           `Couldn't get location with geolocation API, trying with IP:\n${e.message}`,
         );
         getPositionFromIP();
@@ -66,7 +81,7 @@ const App: Component = () => {
   });
 
   return (
-    <main>
+    <>
       <div class={styles.inputs}>
         <div>
           <label for="year">Year</label>
@@ -109,14 +124,27 @@ const App: Component = () => {
             required
             onInput={(e) =>
               e.currentTarget.checkValidity() &&
-              setNumMonths(e.currentTarget.valueAsNumber)
+              handleNumMonths(e.currentTarget.valueAsNumber)
             }
           />
         </div>
       </div>
       <hr />
-      {months()}
-    </main>
+      <For each={monthStates()}>
+        {(state, idx) => (
+          <>
+            <Show when={idx() === 0 || state.zdt.month === 1}>
+              <h2 class={styles["year-header"]}>
+                {state.zdt.toLocaleString(state.locale, {
+                  year: "numeric",
+                })}
+              </h2>
+            </Show>
+            <Calendar {...state} />
+          </>
+        )}
+      </For>
+    </>
   );
 };
 

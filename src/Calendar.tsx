@@ -14,25 +14,23 @@ import PhaseData from "./data/phaseDataDao";
 import { PHASE_NAMES, Position } from "./types/common";
 
 interface CalendarProps {
-  state: {
-    zdt: Temporal.ZonedDateTime;
-    position: Position;
-    locale: string;
-  };
+  zdt: Temporal.ZonedDateTime;
+  position: Position;
+  locale: string;
 }
 
 const Calendar: Component<CalendarProps> = (props) => {
   const fetcher = new PhaseData().getData;
   const resourceProps = createMemo(() => ({
-    zdt: props.state.zdt,
-    position: props.state.position,
+    zdt: props.zdt,
+    position: props.position,
   }));
   const [moonData] = createResource(resourceProps, fetcher);
 
   const month = createMemo(() =>
-    props.state.zdt
-      .toLocaleString(props.state.locale, {
-        calendar: props.state.zdt.calendarId,
+    props.zdt
+      .toLocaleString(props.locale, {
+        calendar: props.zdt.calendarId,
         month: "long",
       })
       .toUpperCase(),

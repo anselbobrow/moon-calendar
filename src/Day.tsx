@@ -1,7 +1,7 @@
 import { splitProps, type Component } from "solid-js";
 
 import styles from "./Day.module.css";
-import { Phase } from "./data/phaseDataDao";
+import { PhaseName } from "./data/phaseDataDao";
 import Moon from "./Moon";
 import { QUARTER_NAMES, WEEKDAYS } from "./types/common";
 
@@ -17,7 +17,7 @@ interface DayProps {
 }
 
 const Day: Component<
-  DayProps & { phase: Phase; afterFirstNewOfMonth: boolean }
+  DayProps & { phaseName: PhaseName; afterFirstNewOfMonth: boolean }
 > = (props) => {
   const [moonProps] = splitProps(props, [
     "eclipticLongitude",
@@ -54,7 +54,7 @@ const Day: Component<
           }}
         >
           {props.isQuarter
-            ? QUARTER_NAMES[props.phase]
+            ? QUARTER_NAMES[props.phaseName]
             : `${Math.round(props.percentFullness)}%`}
         </span>
       </div>

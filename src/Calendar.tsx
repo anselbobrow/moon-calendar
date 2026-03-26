@@ -48,7 +48,7 @@ const Calendar: Component<CalendarProps> = (props) => {
             <p>Loading...</p>
           </Match>
           <Match when={moonData.state === "ready"}>
-            <Index each={moonData()?.phases}>
+            <Index each={moonData()?.phases} fallback={<p>No data.</p>}>
               {(phase) => (
                 <div class={styles.phase}>
                   <div>
@@ -56,7 +56,7 @@ const Calendar: Component<CalendarProps> = (props) => {
                       {(dayProps) => (
                         <Day
                           {...dayProps()}
-                          phase={phase().phase}
+                          phaseName={phase().name}
                           afterFirstNewOfMonth={phase().afterFirstNewOfMonth}
                         />
                       )}
@@ -69,7 +69,7 @@ const Calendar: Component<CalendarProps> = (props) => {
                           phase().afterFirstNewOfMonth,
                       }}
                     >
-                      {PHASE_NAMES[phase().phase]}
+                      {PHASE_NAMES[phase().name]}
                     </span>
                   </Show>
                 </div>

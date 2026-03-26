@@ -2,7 +2,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import {
   MoonData,
   DayProps,
-  Phase,
+  PhaseName,
   PhaseDataDao,
   PhaseDataProps,
   MoonDataPhase,
@@ -119,7 +119,7 @@ class PhaseDataAstroEngine implements PhaseDataDao {
       }
       day = day.add({ days: 1 });
     }
-    return { phase: mq.quarter as Phase, days };
+    return { name: mq.quarter as PhaseName, days };
   };
 
   private getTemporalNoon = (

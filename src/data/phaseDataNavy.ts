@@ -2,7 +2,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import {
   MoonData,
   DayProps,
-  Phase,
+  PhaseName,
   PhaseDataDao,
   PhaseDataProps,
 } from "./phaseDataDao";
@@ -56,7 +56,7 @@ class PhaseDataNavy implements PhaseDataDao {
       return {
         phases: [
           {
-            phase: Phase.WaxingCrescent,
+            name: PhaseName.WaxingCrescent,
             afterFirstNewOfMonth: false, // FIXME unimplemented
             days: this.transformData(data, zdt),
           },
@@ -93,15 +93,15 @@ class PhaseDataNavy implements PhaseDataDao {
       const percentFullness = Math.round(
         percentCycle < 50 ? percentCycle * 2 : percentCycle * -2 + 200,
       );
-      let phase: Phase;
+      let phase: PhaseName;
       if (percentCycle < 25) {
-        phase = Phase.WaxingCrescent;
+        phase = PhaseName.WaxingCrescent;
       } else if (percentCycle < 50) {
-        phase = Phase.WaxingGibbous;
+        phase = PhaseName.WaxingGibbous;
       } else if (percentCycle < 75) {
-        phase = Phase.WaningGibbous;
+        phase = PhaseName.WaningGibbous;
       } else {
-        phase = Phase.WaningCrescent;
+        phase = PhaseName.WaningCrescent;
       }
       return {
         percentFullness,

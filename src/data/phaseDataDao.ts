@@ -3,7 +3,7 @@ import PhaseDataAstroEngine from "./phaseDataAstroEngine";
 import { DayProps } from "../Day";
 import { Position } from "../types/common";
 
-enum Phase {
+enum PhaseName {
   WaxingCrescent,
   WaxingGibbous,
   WaningGibbous,
@@ -11,7 +11,7 @@ enum Phase {
 }
 
 interface MoonDataPhase {
-  phase: Phase;
+  name: PhaseName;
   afterFirstNewOfMonth: boolean;
   days: DayProps[];
 }
@@ -39,7 +39,7 @@ class PhaseData implements PhaseDataDao {
 
 export default PhaseData;
 export {
-  Phase,
+  PhaseName,
   type PhaseDataDao,
   type DayProps,
   type MoonDataPhase,
